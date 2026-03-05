@@ -3,7 +3,6 @@ import '../models/expense.dart';
 import '../utils/app_theme.dart';
 
 /// Dual-mode screen: Add (expense == null) or Edit (expense != null).
-///
 /// Returns Map<String, dynamic> on Save, null on Cancel.
 class AddExpenseScreen extends StatefulWidget {
   const AddExpenseScreen({super.key});
@@ -19,7 +18,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   String? _titleError;
   String? _amountError;
 
-  bool _isEditMode = false;
+  bool _isEditMode  = false;
   Expense? _original;
   bool _initialized = false;
 
@@ -56,9 +55,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     String? titleErr;
     String? amountErr;
 
-    if (title.isEmpty) {
-      titleErr = 'Title cannot be empty.';
-    }
+    if (title.isEmpty) titleErr = 'Title cannot be empty.';
 
     final parsed = double.tryParse(rawAmt);
     if (rawAmt.isEmpty) {
@@ -77,7 +74,6 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       return;
     }
 
-    // Pop with result map
     Navigator.pop(context, {
       'id': _isEditMode
           ? _original!.id
@@ -91,21 +87,21 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kBg,
+      backgroundColor: kSurface,
       appBar: _buildAppBar(),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildHeaderCard(),
-            const SizedBox(height: 28),
+            _buildHeaderBanner(),
+            const SizedBox(height: 24),
             _buildTitleField(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             _buildAmountField(),
-            const SizedBox(height: 32),
+            const SizedBox(height: 28),
             _buildSaveButton(),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             _buildCancelButton(),
           ],
         ),
@@ -115,55 +111,81 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
   // ── AppBar ───────────────────────────────────
   AppBar _buildAppBar() => AppBar(
-        title: Text(
-          _isEditMode ? 'Edit Expense' : 'Add Expense',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(gradient: kGradient),
-        ),
-        backgroundColor: Colors.transparent,
+        backgroundColor: kInk,
         foregroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.arrow_back_ios_new_rounded,
+                size: 16, color: Colors.white),
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          _isEditMode ? 'Edit Expense' : 'New Expense',
+          style: const TextStyle(
+              fontWeight: FontWeight.w800, fontSize: 17, color: Colors.white),
+        ),
+        centerTitle: true,
       );
 
-  // ── Header card ──────────────────────────────
-  Widget _buildHeaderCard() => Container(
-        padding: const EdgeInsets.all(20),
+  // ── Header Banner ────────────────────────────
+  Widget _buildHeaderBanner() => Container(
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          gradient: kGradient,
+          gradient: kGoldGradient,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: kPrimary.withOpacity(0.3),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
+              color: kGold.withOpacity(0.3),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
         child: Row(
           children: [
-            Icon(
-              _isEditMode ? Icons.drive_file_rename_outline : Icons.add_circle_outline,
-              size: 40,
-              color: Colors.white,
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                _isEditMode
+                    ? Icons.drive_file_rename_outline_rounded
+                    : Icons.add_circle_outline_rounded,
+                size: 26,
+                color: kInk,
+              ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _isEditMode ? 'Edit Expense' : 'New Expense',
+                  _isEditMode ? 'Edit Expense' : 'Add Expense',
                   style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: kInk,
+                      letterSpacing: -0.3),
                 ),
                 Text(
                   _isEditMode
                       ? 'Update the details below'
                       : 'Fill in the details below',
-                  style: const TextStyle(fontSize: 13, color: Colors.white70),
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: kInk.withOpacity(0.55),
+                      fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -181,19 +203,21 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   }) =>
       InputDecoration(
         labelText: label,
+        labelStyle: const TextStyle(color: kLabel, fontWeight: FontWeight.w600, fontSize: 13),
         hintText: hint,
+        hintStyle: const TextStyle(color: kLabel),
         errorText: errorText,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: kCard,
         border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none),
+            borderSide: const BorderSide(color: kMist, width: 1.5)),
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none),
+            borderSide: const BorderSide(color: kMist, width: 1.5)),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: kPrimary, width: 2)),
+            borderSide: const BorderSide(color: kGold, width: 2)),
         errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
             borderSide: const BorderSide(color: kRed, width: 1.5)),
@@ -205,64 +229,103 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       );
 
   // ── Title field ──────────────────────────────
-  Widget _buildTitleField() => TextField(
-        controller: _titleController,
-        autofocus: !_isEditMode,
-        decoration: _inputDecoration(
-          label: 'Expense title',
-          hint: 'e.g. Coffee, Groceries, Rent…',
-          errorText: _titleError,
-          prefixIcon: const Icon(Icons.label_outline, color: kPrimary),
+  Widget _buildTitleField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 2, bottom: 6),
+          child: Text(
+            'EXPENSE TITLE',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: kLabel,
+                letterSpacing: 1.0),
+          ),
         ),
-        onChanged: (_) {
-          if (_titleError != null) setState(() => _titleError = null);
-        },
-      );
+        TextField(
+          controller: _titleController,
+          autofocus: !_isEditMode,
+          style: const TextStyle(color: kInk, fontWeight: FontWeight.w500),
+          decoration: _inputDecoration(
+            label: '',
+            hint: 'e.g. Coffee, Groceries, Rent…',
+            errorText: _titleError,
+            prefixIcon: const Icon(Icons.label_outline_rounded, color: kGold),
+          ),
+          onChanged: (_) {
+            if (_titleError != null) setState(() => _titleError = null);
+          },
+        ),
+      ],
+    );
+  }
 
   // ── Amount field ─────────────────────────────
-  Widget _buildAmountField() => TextField(
-        controller: _amountController,
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        decoration: _inputDecoration(
-          label: 'Amount',
-          hint: 'e.g. 150.00',
-          errorText: _amountError,
-          prefixIcon: const Padding(
-            padding: EdgeInsets.only(left: 14, right: 8),
-            child: Text(
-              '₱',
-              style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: kPrimary),
-            ),
+  Widget _buildAmountField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 2, bottom: 6),
+          child: Text(
+            'AMOUNT',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: kLabel,
+                letterSpacing: 1.0),
           ),
-          prefixIconConstraints: const BoxConstraints(minWidth: 0),
         ),
-        onChanged: (_) {
-          if (_amountError != null) setState(() => _amountError = null);
-        },
-      );
+        TextField(
+          controller: _amountController,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          style: const TextStyle(color: kInk, fontWeight: FontWeight.w500),
+          decoration: _inputDecoration(
+            label: '',
+            hint: '0.00',
+            errorText: _amountError,
+            prefixIcon: const Padding(
+              padding: EdgeInsets.only(left: 14, right: 8),
+              child: Text(
+                '₱',
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: kGold),
+              ),
+            ),
+            prefixIconConstraints: const BoxConstraints(minWidth: 0),
+          ),
+          onChanged: (_) {
+            if (_amountError != null) setState(() => _amountError = null);
+          },
+        ),
+      ],
+    );
+  }
 
   // ── Save button ──────────────────────────────
   Widget _buildSaveButton() => Container(
         decoration: BoxDecoration(
-          gradient: kGradient,
+          color: kInk,
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: kPrimary.withOpacity(0.35),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: kInk.withOpacity(0.3),
+              blurRadius: 14,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
         child: ElevatedButton.icon(
           onPressed: _save,
-          icon: const Icon(Icons.save_rounded),
+          icon: const Icon(Icons.save_rounded, color: kGold),
           label: Text(
             _isEditMode ? 'Save Changes' : 'Save Expense',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
@@ -275,16 +338,17 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         ),
       );
 
-  // ── Cancel button — returns null ─────────────
+  // ── Cancel button ────────────────────────────
   Widget _buildCancelButton() => OutlinedButton(
-        onPressed: () => Navigator.pop(context), // null → no update
+        onPressed: () => Navigator.pop(context),
         style: OutlinedButton.styleFrom(
-          foregroundColor: kPrimary,
-          side: const BorderSide(color: kPrimary),
+          foregroundColor: kLabel,
+          side: const BorderSide(color: kMist, width: 1.5),
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14)),
         ),
-        child: const Text('Cancel', style: TextStyle(fontSize: 15)),
+        child: const Text('Cancel',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
       );
 }

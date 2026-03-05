@@ -11,6 +11,9 @@ class ExpensesHomePage extends StatefulWidget {
 }
 
 class _ExpensesHomePageState extends State<ExpensesHomePage> {
+  // ── View toggle ──────────────────────────────
+  bool _showList = true;
+
   // ── Seed data ────────────────────────────────
   final List<Expense> _expenses = [
     Expense(id: '1', title: 'Groceries',       amount: 850.00),
@@ -120,9 +123,10 @@ class _ExpensesHomePageState extends State<ExpensesHomePage> {
       body: Column(
         children: [
           if (_expenses.isNotEmpty) _buildTotalCard(),
-          _buildSectionHeader(),
+          _buildToggleBar(),
+          if (_showList) _buildSectionHeader(),
           Expanded(
-            child: _expenses.isEmpty ? _buildEmptyState() : _buildList(),
+            child: !_showList ? _buildEmptyState() : _buildList(),
           ),
         ],
       ),
@@ -174,11 +178,76 @@ class _ExpensesHomePageState extends State<ExpensesHomePage> {
 
   String _monthLabel() {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
     ];
     return months[DateTime.now().month - 1];
   }
+
+  // ── Toggle Bar ───────────────────────────────
+  Widget _buildToggleBar() => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+        child: Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: kMist,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            children: [
+              _toggleOption(
+                label: 'Expense List',
+                selected: _showList,
+                onTap: () => setState(() => _showList = true),
+              ),
+              _toggleOption(
+                label: 'Empty State',
+                selected: !_showList,
+                onTap: () => setState(() => _showList = false),
+              ),
+            ],
+          ),
+        ),
+      );
+
+  Widget _toggleOption({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) =>
+      Expanded(
+        child: GestureDetector(
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              color: selected ? kInk : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: selected
+                  ? [
+                      BoxShadow(
+                        color: kInk.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                  : [],
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: selected ? Colors.white : kLabel,
+                letterSpacing: 0.1,
+              ),
+            ),
+          ),
+        ),
+      );
 
   // ── Total Card ───────────────────────────────
   Widget _buildTotalCard() => Padding(
